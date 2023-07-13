@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <link rel="stylesheet" href="./css/style.css" />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0"
+    />
+    <link
+      href="http://fonts.googleapis.com/css?family=Lato:400,700"
+      rel="stylesheet"
+      type="text/css"
+    />
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="https://unpkg.com/vue-i18n@9"></script>
+  </head>
+
+  <body>
+    <div id="app" style="height: 100vh">
+      <section class="container">
+        <div class="container__left">
+          <div class="upload__card">
+            <div
+              :class="['upload__card-header', { 'upload__card-header--cursor': typeOfCards === 'upload' }]"
+              @click="$refs.getImage ? $refs.getImage.click() : null"
+            >
+              <img
+                class="image-clear-icon"
+                src="./img/x-icon.png"
+                @click.native.stop="
+                  file = null;
+                  fileUrl = null;
+                  selectedTemplate = '';
+                "
+              />
+              <div class="image-description">
+                <img
+                  style="max-height: 12px; max-width: 12px"
+                  src="./img/plus.png"
+                />
+                {{ $t('upload_image') }}
+              </div>
+              <img :src="displayImage" />
+            </div>
+            <div class="upload__card-footer">
+              <div>{{ $t('benefits') }}</div>
+              <div>
+                {{ form.value ? form.value : (custom_price_value ?
+                custom_price_value : 0) }} €
+              </div>
+            </div>
+            <input
+              v-if="typeOfCards === 'upload'"
+              v-show="false"
+              type="file"
+              id="img"
+              name="img"
+              accept="image/*"
+              ref="getImage"
+              @change="getFile"
+            />
+          </div>
+        </div>
+
+        <div class="container__right">
+          <div class="title">1. {{ $t('card_design') }}</div>
+          <div class="input-select__upload-type">
+            <div class="radio-button__horizontal">
+              <input
+                v-model="typeOfCards"
+                type="radio"
+                id="upload_image_id"
+                name="type"
+                value="upload"
+                @click="selectedTemplate = ''; selectedTemplateIndex  = null"
+              />
+              <label for="upload_image_id">{{ $t('upload_image') }}</label
+              ><br />
+            </div>
+            <div class="radio-button__horizontal">
+              <input
+                v-model="typeOfCards"
+                type="radio"
+                id="upload_custom_id"
+                name="type"
+                value="po_predlogih"
+              />
+              <label for="upload_custom_id">{{ $t('suggestions') }}</label
+              ><br />
+            </div>
+          </div>
+          <div class="image-select">
+            <img
+              :class="[{'selected-img': selectedTemplateIndex === index }, { 'image-select--disabled': typeOfCards !== 'po_predlogih' }]"
+              v-for="(item, index) in templates"
+              :key="index"
+              :src="item.url"
+              style="height: 50px; width: 100px"
+              @click="selectedTemplateIndex = index; selectedTemplate = item.url; file = null;"
+            />
+          </div>
+
+          <div class="title" style="margin-top: 20px">
+            2. {{ $t('card_details') }}
+          </div>
+          <div class="radio-button__vertical card-details__wrapper">
+            <span>{{ $t('amount') }}</span>
+            <div>
+              <input
+                v-model="form.value"
+                type="radio"
+                id="value1"
+                name="price"
+                :value="25"
+                @click="
+                  custom_price = false;
+                  custom_price_value = null;
+                "
+              />
+              <label for="value1">25 {{ $t('currency') }}</label><br />
+            </div>
+            <div>
+              <input
+                v-model="form.value"
+                type="radio"
+                id="value2"
+                name="price"
+                :value="50"
+                @click="
+                  custom_price = false;
+                  custom_price_value = null;
+                "
+              />
+              <label for="value2">50 {{ $t('currency') }}</label><br />
+            </div>
+            <div>
+              <input
+                v-model="form.value"
+                type="radio"
+                id="value3"
+                name="price"
+                :value="75"
+                @click="
+                  custom_price = false;
+                  custom_price_value = null;
+                "
+              />
+              <label for="value3">75 {{ $t('currency') }}</label><br />
+            </div>
+            <div>
+              <input
+                v-model="form.value"
+                type="radio"
+                id="value4"
+                name="price"
+                :value="100"
+                @click="
+                  custom_price = false;
+                  custom_price_value = null;
+                "
+              />
+              <label for="value4">100 {{ $t('currency') }}</label><br />
+            </div>
+            <div class="input-custom__first">
+              <input
+                type="radio"
+                id="value5"
+                name="price"
+                @click="
+                  custom_price = true;
+                  form.value = null
+                "
+              />
+              <input
+                v-model="custom_price_value"
+                type="number"
+                :disabled="!custom_price"
+                for="value5"
+              /><br />
+              <label for="value5" @click="form.value = null">
+                {{ $t('currency') }} </label
+              ><br />
+            </div>
+            <div v-if="errors['value']" class="is-error">
+              {{ errors['value'] }}
+            </div>
+          </div>
+
+          <div class="card-input-details__wrapper">
+            <div
+              :class="['input-custom__second', { 'input-error': !!errors['senderFullName'] }]"
+            >
+              <label for="sender">{{ $t('sender') }}</label>
+              <input
+                v-model="form.senderFullName"
+                class="input-custom"
+                type="text"
+                id="sender"
+              />
+              <div v-if="errors['senderFullName']" class="is-error">
+                {{ errors['senderFullName'] }}
+              </div>
+            </div>
+            <div
+              :class="['input-custom__second', { 'input-error': !!errors['recipientFullName'] }]"
+            >
+              <label for="recipient">{{ $t('recipient') }}</label>
+              <input
+                v-model="form.recipientFullName"
+                class="input-custom"
+                type="text"
+                id="recipient"
+              />
+              <div v-if="errors['recipientFullName']" class="is-error">
+                {{ errors['recipientFullName'] }}
+              </div>
+            </div>
+            <div
+              :class="['input-custom__second', { 'input-error': !!errors['message'] }]"
+            >
+              <label for="message">{{ $t('message') }}</label>
+              <input
+                v-model="form.message"
+                class="input-custom"
+                type="text"
+                id="message"
+              />
+              <div v-if="errors['message']" class="is-error">
+                {{ errors['message'] }}
+              </div>
+            </div>
+            <div
+              :class="['input-custom__second', { 'input-error': !!errors['quantity'] }]"
+            >
+              <label for="quantity">{{ $t('quantity') }}</label>
+              <input
+                v-model="form.quantity"
+                class="input-custom"
+                type="number"
+                id="quantity"
+              />
+              <div v-if="errors['quantity']" class="is-error">
+                {{ errors['quantity'] }}
+              </div>
+            </div>
+          </div>
+          <button class="card-button" @click="storeCard">
+            {{ $t('order_card') }}
+          </button>
+        </div>
+      </section>
+    </div>
+  </body>
+  <script type="module">
+    import sl from "./localization/sl.json" assert { type: "json" };
+    import en from "./localization/en.json" assert { type: "json" };
+    const { createApp } = Vue;
+    const { createI18n } = VueI18n;
+
+    const i18n = createI18n({
+      locale: "sl",
+      messages: { sl, en },
+    });
+
+    const app = createApp({
+      data() {
+        return {
+          selectedTemplateIndex: null,
+          selectedTemplate: "",
+
+          file: null,
+          fileUrl: null,
+          custom_price: false,
+          typeOfCards: "po_predlogih",
+          custom_price_value: null,
+          form: {
+            value: null,
+            senderFullName: "",
+            recipientFullName: "",
+            message: "",
+            quantity: null,
+          },
+          errors: {},
+
+          templates: [
+            {
+              url: "./img/gift_card_template.png",
+            },
+            {
+              url: "./img/gift_card_template.png",
+            },
+            {
+              url: "./img/gift_card_template.png",
+            },
+            {
+              url: "./img/gift_card_template.png",
+            },
+            {
+              url: "./img/gift_card_template.png",
+            },
+            {
+              url: "./img/gift_card_template.png",
+            },
+            {
+              url: "./img/gift_card_template.png",
+            },
+            {
+              url: "./img/gift_card_template.png",
+            },
+            {
+              url: "./img/gift_card_template.png",
+            },
+            {
+              url: "./img/gift_card_template.png",
+            },
+          ],
+        };
+      },
+      // Company can use this to receive data from iFrame
+      // mounted() {
+      //   window.addEventListener("message", (value) => {
+      //     if (
+      //       value &&
+      //       value.data &&
+      //       value.data.call === "store-card-configuration"
+      //     ) {
+      //       this.receivedDataFromIframe = value.data.value;
+      //     }
+      //   });
+      // },
+      methods: {
+        getFile(event) {
+          this.fileUrl = URL.createObjectURL(event.target.files[0]);
+          this.file = event.target.files[0];
+          this.$refs.getImage.value = "";
+        },
+
+        async storeCard() {
+          const requestFormData = new FormData();
+
+          requestFormData.append("value", this.form.value);
+          requestFormData.append("senderFullName", this.form.senderFullName);
+          requestFormData.append(
+            "recipientFullName",
+            this.form.recipientFullName
+          );
+          requestFormData.append("message", this.form.message);
+          requestFormData.append("quantity", this.form.quantity);
+          requestFormData.append("file", this.file);
+          requestFormData.append("fileName", this.file.name);
+
+          // Send request to the server
+          const res = await fetch("https://localhost:5001/StoreData", {
+            method: "POST",
+            headers: {
+              Accept: "application/json",
+              "x-tenant-id": "CompanyTest",
+            },
+            body: requestFormData,
+          });
+          if (res.status !== 200) return;
+          let value = await res.json();
+          this.emitData(value, "store-card-configuration");
+        },
+
+        async getCard() {
+          let res = await fetch("https://localhost:5001/ApiGetCard", {
+            method: "GET",
+            headers: {
+              Accept: "text/plain",
+              "x-tenant-id": "CompanyTest",
+            },
+          });
+          if (res.status !== 200) return;
+          let value = await res.json();
+          this.emitData(value, "get-card-configuration");
+        },
+
+        emitData(value, name) {
+          window.parent.postMessage({
+            call: name,
+            value: value,
+          });
+        },
+
+        validate() {
+          let isError = false;
+          this.errors = {};
+          Object.keys(this.form).map((el) => {
+            if (!this.form[el]) {
+              isError = true;
+              this.errors[el] = this.$t("required." + el);
+            }
+          });
+          return isError;
+        },
+      },
+      computed: {
+        displayImage() {
+          if (this.selectedTemplate) return this.selectedTemplate;
+          if (this.file) return this.file;
+          return "./img/default_card.png";
+        },
+      },
+    });
+
+    app.use(i18n);
+    app.mount("#app");
+  </script>
+</html>
+
+<style>
+  /* Left */
+  .container__left {
+    display: flex;
+    flex-flow: column nowrap;
+    padding: 20px;
+    width: 45%;
+  }
+  .container__left .upload__card {
+    margin: 20px 0;
+    border-radius: 8px;
+    box-shadow: 3px 3px 6px 0px lightgray, -1px -1px 2px 0px lightgray;
+  }
+  .container__left .upload__card-header {
+    position: relative;
+    overflow: hidden;
+    height: 200px;
+  }
+  .image-clear-icon {
+    position: absolute;
+    cursor: pointer;
+    z-index: 2;
+    top: 8px;
+    right: 10px;
+    max-height: 24px;
+    max-width: 24px;
+  }
+  .container__left .upload__card-header img {
+    height: 100%;
+    width: 100%;
+    animation: imageOut 0.5s forwards;
+  }
+  .container__left .upload__card-header:hover img {
+    animation: imageIn 0.5s forwards;
+  }
+  .container__left .upload__card-header--cursor {
+    cursor: pointer;
+  }
+
+  @keyframes imageOut {
+    from {
+      height: 110%;
+      width: 110%;
+    }
+    to {
+      height: 100%;
+      width: 100%;
+    }
+  }
+  @keyframes imageIn {
+    from {
+      height: 100%;
+      width: 100%;
+    }
+    to {
+      height: 110%;
+      width: 110%;
+    }
+  }
+
+  .container__left .upload__card-header .image-description {
+    position: absolute;
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: center;
+    align-items: center;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    font-weight: 500;
+    text-align: center;
+    font-size: 20px;
+  }
+  .container__left .upload__card-footer {
+    padding: 20px;
+  }
+  .container__left .upload__card-footer div:first-child {
+    font-size: 14px;
+  }
+  .container__left .upload__card-footer div:last-child {
+    margin-top: 20px;
+    font-size: 20px;
+    font-weight: 500;
+  }
+
+  /* Right */
+  .container__right {
+    width: 55%;
+    padding: 40px 20px 20px 20px;
+  }
+  .input-select__upload-type {
+    display: flex;
+  }
+  .image-select {
+    display: flex;
+    flex-flow: row wrap;
+    max-width: 600px;
+    margin: 10px 0;
+  }
+  .image-select img {
+    margin: 4px 10px 4px 0;
+    transition: all 0.25s;
+  }
+  .image-select img:hover {
+    cursor: pointer;
+    box-shadow: 0 0 4px 1px lightgray;
+  }
+  .selected-img {
+    box-shadow: 0 0 0px 2px #0050a0 !important;
+  }
+  .image-select--disabled {
+    filter: brightness(60%);
+    pointer-events: none !important;
+  }
+  .card-details__wrapper {
+    display: flex;
+    flex-flow: column nowrap;
+    margin-bottom: 10px;
+  }
+  .card-details__wrapper span {
+    font-size: 14px;
+    color: gray;
+    margin-bottom: 2px;
+    font-style: italic;
+  }
+  .card-details__wrapper div {
+    display: flex;
+    align-items: center;
+    margin: 1px 0;
+  }
+
+  .card-input-details__wrapper {
+    margin-top: 20px;
+    margin-bottom: 30px;
+  }
+  .card-input-details__wrapper div {
+    display: flex;
+    flex-flow: column nowrap;
+    margin: 10px 0;
+  }
+
+  .card-button {
+    border: unset;
+    color: white;
+    font-style: italic;
+    padding: 15px 25px;
+    border-radius: 27px;
+    background: linear-gradient(270deg, #0078b4 0%, #0050a0 100%);
+  }
+</style>

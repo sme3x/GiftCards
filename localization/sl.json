@@ -1,0 +1,24 @@
+{
+  "order_card": "Naroči kartico",
+  "upload_image": "Naloži sliko",
+  "benefits": "Privošči si Company ugodnosti",
+  "card_design": "Oblikovanje kartice",
+  "suggestions": "Po predlogih",
+  "card_details": "Podrobnosti kartice",
+  "amount": "Znesek",
+
+  "currency": "EUR",
+
+  "sender": "Pošiljatelj",
+  "recipient": "Prejemnik",
+  "message": "Sporočilo",
+  "quantity": "Količina",
+
+  "required": {
+    "value": "Znesek je obvezno polje",
+    "senderFullName": "Pošiljatelj je obvezno polje",
+    "recipientFullName": "Prejemnik je obvezno polje",
+    "message": "Sporočilo je obvezno polje",
+    "quantity": "Količina je obvezno polje"
+  }
+}

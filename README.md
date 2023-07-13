@@ -1,1 +1,5 @@
-# GiftCards
+## Run aplication
+
+```
+npx serve
+```

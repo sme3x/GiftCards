@@ -1,0 +1,24 @@
+{
+  "order_card": "Order card",
+  "upload_image": "Upload image",
+  "benefits": "Treat yourself to Company benefits",
+  "card_design": "Card design",
+  "suggestions": "According to the suggestions",
+  "card_details": "Card details",
+  "amount": "Amount",
+
+  "currency": "EUR",
+
+  "sender": "Sender",
+  "recipient": "Recipient",
+  "message": "Message",
+  "quantity": "quantity",
+
+  "required": {
+    "value": "Amoun field is required",
+    "senderFullName": "Sender field is required",
+    "recipientFullName": "Recipient field is required",
+    "message": "Message field is required",
+    "quantity": "Quantity field is required"
+  }
+}
